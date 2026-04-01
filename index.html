@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>数据帝国：离线资本实验室</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-shape shape-a"></div>
+  <div class="bg-shape shape-b"></div>
+  <div class="bg-grid"></div>
+
+  <main class="app">
+    <header class="topbar glass">
+      <div>
+        <h1>数据帝国：离线资本实验室</h1>
+        <p id="eventBanner" class="event-banner">市场平稳运行中</p>
+      </div>
+      <div class="actions">
+        <button id="slotBtn" class="btn">存档栏位</button>
+        <button id="saveBtn" class="btn">手动存档</button>
+        <button id="exportBtn" class="btn">导出存档</button>
+        <button id="importBtn" class="btn">导入存档</button>
+        <button id="rebootBtn" class="btn danger">重构时代</button>
+      </div>
+    </header>
+
+    <section class="resource-grid">
+      <article class="res-card glass">
+        <h3>资金</h3>
+        <strong id="funds">0</strong>
+      </article>
+      <article class="res-card glass">
+        <h3>数据</h3>
+        <strong id="data">0</strong>
+      </article>
+      <article class="res-card glass">
+        <h3>算力</h3>
+        <strong id="compute">0</strong>
+      </article>
+      <article class="res-card glass">
+        <h3>用户</h3>
+        <strong id="users">0</strong>
+      </article>
+      <article class="res-card glass">
+        <h3>影响力</h3>
+        <strong id="influence">0</strong>
+      </article>
+      <article class="res-card glass">
+        <h3>遗产点</h3>
+        <strong id="legacy">0</strong>
+      </article>
+    </section>
+
+    <section class="main-grid">
+      <article class="panel glass">
+        <div class="panel-head">
+          <h2>基础设施</h2>
+          <div class="buy-controls">
+            <label for="buyMode">购买</label>
+            <select id="buyMode">
+              <option value="1">x1</option>
+              <option value="10">x10</option>
+              <option value="max">MAX</option>
+            </select>
+          </div>
+        </div>
+        <div id="buildingList" class="list"></div>
+      </article>
+
+      <article class="panel glass">
+        <h2>策略升级</h2>
+        <div id="upgradeList" class="list"></div>
+      </article>
+
+      <article class="panel glass chart-panel">
+        <h2>资金走势</h2>
+        <canvas id="fundChart" width="680" height="230"></canvas>
+        <p class="subtle" id="pps">每秒产出：0 资金</p>
+      </article>
+
+      <article class="panel glass">
+        <h2>阶段任务</h2>
+        <div id="questBox" class="quest"></div>
+      </article>
+
+      <article class="panel glass log-panel">
+        <h2>系统日志</h2>
+        <div id="logBox" class="log-box"></div>
+      </article>
+
+      <article class="panel glass help-panel">
+        <h2>玩法提示</h2>
+        <ul>
+          <li>数据探针和算力机架自带基础现金流，前期不会卡死。</li>
+          <li>先买数据探针和算力机架，保障原料与算力。</li>
+          <li>产品工坊会自动把数据与算力转成资金和用户。</li>
+          <li>媒体中心会放大用户价值，稳定增加影响力。</li>
+          <li>升级和遗产点可以形成指数级滚雪球。</li>
+          <li>支持离线收益，关闭后再次进入会自动补算。</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <div id="slotOverlay" class="slot-overlay active">
+    <div class="slot-panel glass">
+      <h2>选择存档栏位</h2>
+      <p class="subtle slot-subtitle">三个栏位完全独立，支持彻底删除。</p>
+      <div id="slotList" class="slot-list"></div>
+      <button id="closeSlotOverlayBtn" class="btn small">返回游戏</button>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -85,11 +85,18 @@ if (!(Test-Path $zip)) {
 
 $tg = Resolve-TelegramConfig -CurrentRoot $root
 $uri = "https://api.telegram.org/bot$($tg.BotToken)/sendDocument"
-$form = @{
-  chat_id = $tg.ChatId
-  caption = "data-empire-idle pc build"
-  document = Get-Item $zip
+try {
+  $form = @{
+    chat_id = $tg.ChatId
+    caption = "data-empire-idle pc build"
+    document = Get-Item $zip
+  }
+  Invoke-RestMethod -Uri $uri -Method Post -Form $form | Out-Null
+} catch {
+  # PowerShell 5.1 lacks -Form support for Invoke-RestMethod on some systems.
+  & curl.exe -s -X POST $uri `
+    -F "chat_id=$($tg.ChatId)" `
+    -F "caption=data-empire-idle pc build" `
+    -F "document=@$zip" | Out-Null
 }
-
-Invoke-RestMethod -Uri $uri -Method Post -Form $form | Out-Null
 Write-Host "Sent: $zip"

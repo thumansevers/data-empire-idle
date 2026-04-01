@@ -20,7 +20,7 @@ function Resolve-TelegramConfig {
   $workspace = Split-Path -Parent $CurrentRoot
   $cfgPath = $null
 
-  if ($env:OPENCLAW_CONFIG_PATH -and (Test-Path $env:OPENCLAW_CONFIG_PATH)) {
+  if (-not [string]::IsNullOrWhiteSpace($env:OPENCLAW_CONFIG_PATH) -and (Test-Path $env:OPENCLAW_CONFIG_PATH)) {
     $cfgPath = $env:OPENCLAW_CONFIG_PATH
   } else {
     $latest = Get-ChildItem -Path $workspace -Directory -ErrorAction SilentlyContinue |
@@ -47,11 +47,25 @@ function Resolve-TelegramConfig {
     $allow = @()
     if ($json.channels.telegram.allowFrom) { $allow += $json.channels.telegram.allowFrom }
     if ($json.channels.telegram.groupAllowFrom) { $allow += $json.channels.telegram.groupAllowFrom }
-    $chat = $allow | Where-Object { "$_" -match "^\d+$" } | Select-Object -First 1
+    $chat = $allow | Where-Object { "$_" -match "^\d+$" } | Select-Object -Last 1
   }
 
   if (-not $chat -and "$($json.channels.telegram.defaultTo)" -match "^\d+$") {
     $chat = "$($json.channels.telegram.defaultTo)"
+  }
+
+  if (-not $chat -and $token) {
+    try {
+      $updates = Invoke-RestMethod -Uri "https://api.telegram.org/bot$token/getUpdates" -Method Get
+      if ($updates.ok -and $updates.result.Count -gt 0) {
+        $latestUpdate = $updates.result | Sort-Object update_id -Descending | Select-Object -First 1
+        if ($latestUpdate.message -and $latestUpdate.message.chat -and "$($latestUpdate.message.chat.id)" -match "^-?\d+$") {
+          $chat = "$($latestUpdate.message.chat.id)"
+        } elseif ($latestUpdate.channel_post -and $latestUpdate.channel_post.chat -and "$($latestUpdate.channel_post.chat.id)" -match "^-?\d+$") {
+          $chat = "$($latestUpdate.channel_post.chat.id)"
+        }
+      }
+    } catch {}
   }
 
   if (-not $token -or -not $chat) {

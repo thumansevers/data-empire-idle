@@ -8,10 +8,44 @@ param(
 $ErrorActionPreference = "Stop"
 
 function Get-GitHubCredential {
+  $envToken = $env:GITHUB_TOKEN
+  if (-not $envToken) { $envToken = $env:GH_TOKEN }
+  $envUser = $env:GITHUB_USERNAME
+
+  if ($envToken) {
+    if (-not $envUser) {
+      try {
+        $headers = @{
+          Authorization = "Bearer $envToken"
+          Accept = "application/vnd.github+json"
+          "X-GitHub-Api-Version" = "2022-11-28"
+          "User-Agent" = "data-empire-idle-publisher"
+        }
+        $me = Invoke-RestMethod -Method Get -Uri "https://api.github.com/user" -Headers $headers
+        if ($me -and $me.login) {
+          $envUser = "$($me.login)"
+        }
+      } catch {
+      }
+    }
+
+    if (-not $envUser) {
+      $envUser = git config --global --get user.name 2>$null
+    }
+    if (-not $envUser) {
+      $envUser = git config --local --get user.name 2>$null
+    }
+    if (-not $envUser) {
+      throw "GITHUB_TOKEN/GH_TOKEN is set but cannot resolve GitHub username. Set GITHUB_USERNAME too."
+    }
+
+    return @{ Username = "$envUser"; Token = "$envToken" }
+  }
+
   $inputText = "protocol=https`nhost=github.com`n`n"
   $out = $inputText | git credential fill
   if (-not $out) {
-    throw "No GitHub credential found via 'git credential fill'."
+    throw "No GitHub credential found (checked env GITHUB_TOKEN/GH_TOKEN and git credential fill)."
   }
 
   $username = ""
